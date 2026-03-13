@@ -1,14 +1,11 @@
 ---
 name: platform-architecture
 description: >
-  This skill should be used when the user asks to "explain the Microsoft Frontier Agent Platform",
-  "show me how the Copilot architecture works", "create an architecture diagram", "how do these
-  Microsoft AI components fit together", "design an agent solution architecture", "what is the
-  Microsoft agent stack", "map out the platform layers", or needs help understanding how M365
-  Copilot, Agent Store, agent hosting, intelligence services, MCP servers, connectors, enterprise
-  data platform, and the Agent Control System relate to each other. Also triggers when the user
-  asks about platform component selection, integration patterns, or solution architecture design
-  for any Microsoft Copilot or agent scenario.
+  Use when the user asks about the Microsoft Frontier Agent Platform architecture, how
+  platform components fit together, solution architecture design, component selection,
+  integration patterns, or the 10-layer platform model (Copilot UI, Agent Store, hosting,
+  intelligence, protocols, MCP servers, connectors, data platform, systems of record,
+  Agent Control System).
 ---
 
 # Microsoft Frontier Agent Platform Architecture

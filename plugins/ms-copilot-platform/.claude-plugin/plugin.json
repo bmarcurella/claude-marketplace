@@ -1,7 +1,21 @@
 {
   "name": "ms-copilot-platform",
+  "version": "1.1.0",
   "description": "Build, deploy, and govern AI agents on the Microsoft Frontier Agent Platform. Uses Microsoft Agents Toolkit for scaffolding, generates project CLAUDE.md files for AI assistant context, and detects MCP servers to automate unfamiliar technologies. Covers declarative agents, custom engine agents, Copilot Studio, Azure AI Foundry, Agents SDK, connectors, Agent 365 governance, and the full enterprise stack.",
   "author": {
     "name": "Brandon Marcurella"
-  }
+  },
+  "license": "MIT",
+  "keywords": [
+    "microsoft",
+    "copilot",
+    "agents",
+    "azure",
+    "m365",
+    "agent-365",
+    "mcp",
+    "copilot-studio",
+    "agents-toolkit",
+    "frontier-agent-platform"
+  ]
 }

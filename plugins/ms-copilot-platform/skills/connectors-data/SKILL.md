@@ -1,14 +1,11 @@
 ---
 name: connectors-data
 description: >
-  This skill should be used when the user asks about "MCP servers for Microsoft", "connect my
-  agent to Outlook", "connect to Teams", "connect to Salesforce", "connect to SAP",
-  "Microsoft Graph connectors", "Dataverse integration", "Microsoft Fabric", "enterprise data
-  platform", "connect agent to data", "A2A protocol", "Model Context Protocol", "OpenAPI
-  integration", "agent connectors", "D365 connector", "Workday connector", "ServiceNow connector",
-  or any question about connecting agents to enterprise data sources, systems of record, MCP
-  servers, open protocols, or the enterprise data platform. Also covers Azure Databricks, Fabric IQ,
-  Work IQ, semantic models, data flows, and BI integration.
+  Use when the user asks about connecting agents to data sources, enterprise systems, or
+  other agents. Covers Microsoft MCP servers (Outlook, Teams, Fabric, D365), enterprise
+  connectors (Salesforce, SAP, Workday, ServiceNow), open protocols (MCP, A2A, OpenAPI),
+  the enterprise data platform (Databricks, Fabric, Dataverse), and the intelligence layer
+  (Work IQ, Fabric IQ, Foundry IQ).
 ---
 
 # Connectors, Data & Open Protocols

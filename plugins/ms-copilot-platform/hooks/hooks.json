@@ -1,0 +1,12 @@
+{
+  "SessionStart": [
+    {
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Quietly check if the current working directory contains a Microsoft agent project. Look for: a 'teamsapp.yml' or 'teamsapp.local.yml' file (Agents Toolkit), an 'appPackage/' directory, a CLAUDE.md that mentions 'Agents Toolkit', 'Copilot', 'Agent 365', or 'Microsoft Agents SDK', or a package.json/requirements.txt with agent-related Microsoft dependencies. If you find evidence of a Microsoft agent project, briefly note the agent type (declarative or custom engine) and remind the user that the ms-copilot-platform plugin is active with /ms-copilot-status and /refresh-platform-docs available. Keep it to 1-2 sentences. If you do NOT find a Microsoft agent project, say nothing — produce no output at all."
+        }
+      ]
+    }
+  ]
+}

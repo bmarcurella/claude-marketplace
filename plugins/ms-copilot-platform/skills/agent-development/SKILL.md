@@ -1,17 +1,11 @@
 ---
 name: agent-development
 description: >
-  This skill should be used when the user asks to "build an agent", "create a Copilot agent",
-  "develop a Microsoft agent", "set up Copilot Studio", "create a declarative agent",
-  "build a custom engine agent", "use the M365 Agents SDK", "build with Azure AI Foundry",
-  "create a Power Platform agent", "make a Teams bot", "develop an agent for Microsoft 365",
-  "what agent type should I use", "build an autonomous agent", "use A2A protocol",
-  "use LangChain with Microsoft agents", "use Semantic Kernel", "host an MCP server",
-  "build a multi-agent system", "set up agent infrastructure", or any variation of building,
-  developing, or creating AI agents on the Microsoft platform. Covers the full spectrum from
-  zero-code (SharePoint Agent, Agent Builder) through low-code (Copilot Studio) to pro-code
-  (Agents SDK, Foundry, Agent Framework). Also triggers for agent review, improvement,
-  troubleshooting, and making agents more capable or agentic.
+  Use when the user wants to build, create, develop, or scaffold AI agents on the Microsoft
+  platform — including declarative agents, custom engine agents, Copilot Studio, Azure AI
+  Foundry, and the M365 Agents SDK. Also triggers for agent type selection, agent review
+  and improvement, multi-agent systems, and choosing between zero-code, low-code, and
+  pro-code paths.
 ---
 
 # Agent Development on the Microsoft Frontier Platform

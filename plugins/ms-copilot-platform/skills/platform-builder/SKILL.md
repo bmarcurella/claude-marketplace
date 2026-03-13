@@ -1,18 +1,10 @@
 ---
 name: platform-builder
 description: >
-  This skill should be used when the user asks to "build the infrastructure", "automate the
-  deployment", "create everything from the design", "provision the agent environment",
-  "generate the Bicep templates", "auto-build after approval", "scaffold the entire solution",
-  "generate ARM templates", "set up the Azure resources", "create the Power Platform environment",
-  "deploy the agent stack", "infrastructure as code for agents", "automate agent setup",
-  "build from the architecture plan", "execute the design", "build it for me",
-  "walk me through building it", "set up Docker for my agent", "create the MCP server",
-  "scaffold the project", "generate the deployment scripts", or any request to automatically
-  generate and provision the infrastructure, code, and configurations needed to implement a
-  designed agent solution. This is the automation engine that turns approved architecture
-  designs into deployable artifacts with two modes: guided walkthrough (learn while building)
-  and autonomous build (Claude Code generates everything).
+  Use when the user wants to scaffold, build, provision, or deploy an agent solution.
+  This is the execution engine that turns approved plans into working projects — scaffolding
+  via Agents Toolkit, generating infrastructure (Bicep, Docker, CI/CD), configuring the
+  agent, and deploying to Azure. Supports guided, autonomous, and hybrid execution modes.
 ---
 
 # Platform Builder — Build, Scaffold, and Deploy

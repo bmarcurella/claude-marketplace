@@ -1,14 +1,11 @@
 ---
 name: agent-governance
 description: >
-  This skill should be used when the user asks about "Agent 365", "agent governance",
-  "agent security", "Entra for agents", "Purview for agents", "Defender for agents",
-  "Copilot Analytics", "agent compliance", "agent monitoring", "agent operations",
-  "agent registry", "agent quotas", "rate limiting for agents", "TPM PTU",
-  "responsible AI for agents", "guardrails for agents", "agent lifecycle management",
-  "agent identity", "agent access control", or any question about managing, governing,
-  securing, monitoring, or operating agents at enterprise scale. Covers the full Agent
-  Control System including Agent 365, Copilot Analytics, and Operations.
+  Use when the user asks about agent governance, security, compliance, or operations at
+  enterprise scale. Covers Agent 365 (the control plane), Entra ID for agent identity,
+  Purview for data governance, Defender for threat protection, Copilot Analytics for
+  monitoring, and operations (registry, quotas, TPM/PTU, responsible AI, lifecycle
+  management).
 ---
 
 # Agent Governance & Control System
