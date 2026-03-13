@@ -1,0 +1,7 @@
+{
+  "name": "ms-copilot-platform",
+  "description": "Comprehensive guide to the Microsoft Frontier Agent Platform — architecture, agent development, connectors, governance, hands-on labs, and automated infrastructure building. Covers M365 Copilot, Copilot Studio, Azure AI Foundry, Agents SDK, MCP servers, Agent 365, and the full enterprise agent stack.",
+  "author": {
+    "name": "Brandon Marcurella"
+  }
+}
