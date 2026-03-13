@@ -15,220 +15,303 @@ description: >
   and autonomous build (Claude Code generates everything).
 ---
 
-# Platform Builder — Automated Solution Deployment
+# Platform Builder — Build, Scaffold, and Deploy
 
-The automation engine for the Microsoft Frontier Agent Platform. Turns approved architecture
-designs into deployable artifacts. Operates in two modes: guided walkthrough for learning,
-or autonomous build for speed.
+The execution engine for the Microsoft Frontier Agent Platform. Takes an approved plan from
+the `agent-development` skill and turns it into a working project. Uses the **Microsoft
+Agents Toolkit** for scaffolding and adds infrastructure, configuration, and governance
+on top.
 
-## Core Principle: Build with Understanding
+## Core Principles
 
-Every action — whether guided or autonomous — includes:
-1. **WHAT** is being created
-2. **WHY** it's needed (linked to the architecture design)
-3. **WHAT'S REQUIRED** before it can proceed (prerequisites, permissions)
-4. **WHAT IT COSTS** (licensing and resource implications)
-5. **WHAT TO WATCH FOR** (risks, gotchas, common mistakes)
+1. **Agents Toolkit first** — Scaffold via `agents-toolkit new`, not custom file generation.
+   The Toolkit templates are maintained by Microsoft and stay current with SDK versions.
+2. **Environment-aware** — Detect what the user has installed and help fill gaps, including
+   MCP servers that can automate unfamiliar technologies.
+3. **CLAUDE.md on every project** — Generate a project-specific CLAUDE.md so any AI
+   assistant (Claude Code, GitHub Copilot) has full context in future sessions.
+4. **Teach as you go** — Every action explains what and why, not just how.
 
-## Two Execution Modes
+---
 
-### Mode A: Guided Walkthrough (Default)
+## Phase 0: Environment Setup
 
-Walk through each phase step-by-step. At every step:
+Before building anything, check what the user has and what they need. This phase is
+critical — it prevents the "I followed the steps but nothing works" experience.
 
-```
-Step [N.M]: [Action Name]
-─────────────────────────
-📋 WHAT: [What is being created]
-🎯 WHY:  [Why it matters architecturally]
-🔧 HOW:  [Exact commands, files, configurations]
-✅ VERIFY: [How to confirm success]
-💡 LEARN: [Architecture concept + docs link]
-⚠️ TROUBLESHOOT: [Common failures and fixes]
-```
+### Detect Installed Tooling
 
-Present one step at a time. Wait for confirmation. Explain concepts as they arise.
-This mode is ideal for learning, team enablement, and first-time builds.
-
-### Mode B: Autonomous Build (Claude Code in VS Code)
-
-Generate all artifacts at once — a complete, deployable project. Produces:
+Check for the tools the plan requires:
 
 ```
-[project-name]/
-├── README.md              # Full architecture explanation + setup guide
-├── src/                   # All application code
-├── infra/                 # Bicep templates for Azure provisioning
-├── Dockerfile             # Container definition
-├── docker-compose.yml     # Local development environment
-├── scripts/
-│   ├── deploy.sh          # One-command deployment
-│   ├── cleanup.sh         # Complete teardown
-│   └── setup-local.sh     # Local environment bootstrapping
-├── tests/                 # Test suite
-├── .env.example           # Environment variable template
-└── .github/workflows/     # CI/CD pipeline
+ENVIRONMENT CHECK
+━━━━━━━━━━━━━━━━
+
+VS Code Extensions:
+  ✓ / ✗  Microsoft Agents Toolkit
+  ✓ / ✗  Azure Functions (if plan uses Functions)
+  ✓ / ✗  Docker (if plan uses containers)
+  ✓ / ✗  Bicep (if plan uses IaC)
+  ✓ / ✗  Python / C# / Node.js extension (matching plan language)
+
+CLI Tools:
+  ✓ / ✗  node / npm (version)
+  ✓ / ✗  python (version)
+  ✓ / ✗  dotnet (version)
+  ✓ / ✗  Azure CLI (az)
+  ✓ / ✗  Docker Desktop
+  ✓ / ✗  git
+
+MCP Servers (configured in user's environment):
+  ✓ / ✗  Azure MCP Server — automates resource provisioning
+  ✓ / ✗  GitHub MCP Server — automates repo setup and CI/CD
+  ✓ / ✗  Foundry MCP Server — automates model deployment (if plan uses Foundry)
+  ✓ / ✗  Microsoft Graph MCP — automates Entra app registration
 ```
 
-The README serves as the architecture document — it explains every decision,
-every component, and every configuration choice.
+### Recommend MCP Servers for Unfamiliar Technologies
 
-### Mode C: Hybrid (Recommended)
+This is the key value-add. If the plan requires a technology the user isn't comfortable
+with, recommend an MCP server that lets the AI assistant handle it:
 
-Autonomous for infrastructure and boilerplate. Guided for agent logic and customization.
+| Plan Requires | User Isn't Comfortable With | Recommend |
+|---------------|----------------------------|-----------|
+| Azure Container Apps | Container deployment | **Azure MCP Server** — provisions and deploys containers |
+| Azure Functions | Serverless setup | **Azure MCP Server** — creates and configures Function Apps |
+| Azure AI Foundry | Model management | **Foundry MCP Server** — deploys models, configures endpoints |
+| Entra app registration | Identity/auth setup | **Microsoft Graph MCP** — registers apps, sets permissions |
+| GitHub Actions CI/CD | Pipeline configuration | **GitHub MCP Server** — creates workflows, manages repos |
+| Azure OpenAI | Model deployment | **Azure MCP Server** — provisions OpenAI resources |
 
-1. **Auto-generate:** Project scaffold, Bicep, Docker, deployment scripts
-2. **Guide through:** AI configuration, custom instructions, tool implementation
-3. **Auto-generate:** Tests, CI/CD, monitoring setup
-4. **Guide through:** First deployment, testing, Agent 365 registration
+Read `references/environment-tooling.md` for the full mapping of plan requirements to
+MCP servers, extensions, and CLIs.
 
-## Build Process
+### Install and Configure
 
-### Phase 1: Design Validation
+For each missing requirement:
+1. Explain what it does and why the plan needs it
+2. Offer to install/configure it (with user permission)
+3. For MCP servers: add to the project's `.mcp.json` or the user's MCP configuration
+4. Verify the installation works
 
-Before building, validate the architecture design:
+---
 
-1. **Completeness check** — All required components specified?
-2. **Compatibility check** — Components work together?
-3. **Prerequisites check** — Licenses, permissions, environments available?
+## Phase 1: Design Validation
+
+Validate the plan from `agent-development` before building:
+
+1. **Completeness** — All required components specified?
+2. **Compatibility** — Components work together?
+3. **Prerequisites** — Licenses, permissions, environments available?
 4. **Cost estimation** — Azure resources, licenses, connectors
-5. **Security review** — Follows best practices?
+5. **Security** — Follows least-privilege and Key Vault patterns?
 
 Present a **Build Readiness Report:**
 
 ```
 BUILD READINESS REPORT
 ━━━━━━━━━━━━━━━━━━━━━
-🟢 READY
-   ✓ Azure subscription active
-   ✓ Azure OpenAI quota available
-   ✓ VS Code + Agents Toolkit installed
 
-🟡 ATTENTION NEEDED (can proceed)
-   ⚡ Agent 365 license not detected — governance optional for dev
-   ⚡ Custom domain not configured — can use default Azure URL
+READY:
+  ✓ Azure subscription active
+  ✓ Agents Toolkit installed (v[version])
+  ✓ Python 3.11+ available
+  ✓ Azure MCP Server configured — will handle resource provisioning
 
-🔴 MUST RESOLVE
-   ✗ No Entra admin consent — cannot register app
-   ✗ Missing Key Vault access — need Key Vault Secrets Officer role
+ATTENTION NEEDED (can proceed):
+  ~ Agent 365 license not detected — governance optional for dev
+  ~ Custom domain not configured — can use default Azure URL
+
+MUST RESOLVE:
+  ✗ No Entra admin consent — cannot register app
+  ✗ Missing Key Vault access — need Key Vault Secrets Officer role
 ```
 
 Read `references/validation-rules.md` for the complete ruleset.
 
-### Phase 2: Build Plan Generation
+---
 
-Generate a sequenced plan matching the architecture design:
+## Phase 2: Scaffold via Agents Toolkit
 
-```
-Build Plan: [Solution Name]
-━━━━━━━━━━━━━━━━━━━━━━━━━━
+Run the appropriate Agents Toolkit template command from the plan:
 
-Phase 1: Foundation (Azure Resources)     [~30 min]
-  ├── 1.1 Resource Group
-  ├── 1.2 Managed Identity
-  ├── 1.3 Key Vault
-  └── 1.4 Application Insights
+```bash
+# Example: Custom engine agent in Python
+agents-toolkit new custom-engine-agent --lang python --name "contoso-support"
 
-Phase 2: AI Services                      [~20 min]
-  ├── 2.1 Azure OpenAI deployment
-  └── 2.2 Model configuration
-
-Phase 3: Agent Infrastructure             [~1 hour]
-  ├── 3.1 Project scaffold (from template)
-  ├── 3.2 Agent code (handler + tools)
-  ├── 3.3 Docker configuration
-  └── 3.4 Local testing
-
-Phase 4: Integrations                     [~1 hour]
-  ├── 4.1 MCP server setup (if applicable)
-  ├── 4.2 Connector configurations
-  ├── 4.3 Knowledge source setup
-  └── 4.4 Integration testing
-
-Phase 5: Governance & Deployment          [~45 min]
-  ├── 5.1 Entra app registration
-  ├── 5.2 Bot Service registration
-  ├── 5.3 Agent 365 registration
-  ├── 5.4 Deploy to Azure
-  └── 5.5 Publish to channels
+# Example: Declarative agent
+agents-toolkit new declarative-agent --name "hr-helper"
 ```
 
-### Phase 3: Artifact Generation
+The Toolkit generates the base project structure. Do NOT generate these files manually —
+the Toolkit templates stay current with SDK versions and include correct dependencies.
 
-Use project templates from `agent-development/references/project-templates.md`.
-Generate artifacts for each category:
+After scaffolding, explain the project structure to the user:
+- What each directory and key file does
+- Where they'll add their custom logic
+- What the Toolkit manages vs what we'll configure
 
-**Infrastructure as Code:**
-- Bicep templates — modular, parameterized, with cleanup scripts
-- Docker files — agent containers, MCP server containers
-- CI/CD pipelines — GitHub Actions or Azure DevOps
+---
+
+## Phase 3: Generate Project CLAUDE.md
+
+Immediately after scaffolding, generate a `CLAUDE.md` at the project root. This file
+captures all decisions from the plan so any AI assistant understands the project.
+
+Read `references/project-claude-template.md` for the template. The CLAUDE.md includes:
+
+- **Project identity** — what this agent is, who it's for, where it runs
+- **Architecture decisions** — agent type, language, framework, and why each was chosen
+- **Key files** — what each important file does and where custom logic lives
+- **Connectors and data** — what systems the agent connects to and how
+- **Build/test/deploy commands** — the exact commands for each lifecycle stage
+- **MCP servers configured** — what's available for automation in this project
+- **Prerequisites verified** — what was confirmed during environment setup
+- **Conventions** — naming, error handling, testing patterns for this project
+
+This CLAUDE.md is a living document — it should be updated as the project evolves.
+
+---
+
+## Phase 4: Configure the Agent
+
+With the scaffold in place, layer on the plan's custom configuration:
+
+### Agent Instructions
+- Write or refine the system prompt / `instructions.md`
+- Define role, boundaries, tone, fallback behavior
+- Add negative instructions (what the agent must NOT do)
+
+### Knowledge Sources
+- Configure SharePoint sites, uploaded files, or web sources
+- Set up Copilot connectors for external data
+
+### Actions and Tools
+- Implement custom tools/functions defined in the plan
+- Configure OpenAPI plugins for external APIs
+- Set up MCP server connections
+
+### Manifest and Configuration
+- Update the app manifest with correct metadata
+- Configure authentication flows (Entra ID)
+- Set up environment variables (`.env` from `.env.example`)
+
+---
+
+## Phase 5: Infrastructure (Beyond the Agent)
+
+For custom engine agents, set up the hosting and supporting infrastructure:
+
+### Infrastructure as Code
+- Generate Bicep templates for Azure resources (modular, parameterized)
+- Include cleanup/teardown scripts
+- If Azure MCP Server is configured, use it to provision resources directly
 
 Read `references/iac-templates.md` for Bicep patterns.
 
-**Agent Code:**
-- Project scaffold from the appropriate template (T1-T8)
-- Domain-specific tools
-- Custom instructions / system prompts
-- Test files
+### Docker Configuration
+- Dockerfile for the agent container
+- docker-compose.yml for local development (agent + any MCP servers)
+- Container registry configuration for deployment
 
-Read `references/agent-scaffolds.md` for scaffolding details.
+### CI/CD Pipeline
+- GitHub Actions or Azure DevOps pipeline
+- Build → Test → Deploy stages
+- Environment-specific configurations (dev, staging, prod)
 
-**Connector & Integration:**
-- MCP server code (if hosting custom tools)
-- OpenAPI specs for API plugins
-- Power Automate flow definitions
-- Graph API permissions manifest
+---
 
-**Governance:**
-- Entra app registration manifest
-- RBAC role assignments
-- Agent 365 registration config
-- Monitoring dashboard definitions
+## Phase 6: Test and Validate
 
-### Phase 4: Execution
+### Local Testing
+- Run via Agents Toolkit test harness (Agents Playground)
+- Test each tool/action individually
+- Test conversation flows end-to-end
+- Verify connector integrations
 
-**In Guided mode:** Present each step with the WHAT/WHY/HOW/VERIFY/LEARN format.
+### Integration Testing
+- Sideload to Teams / M365 for real-environment testing
+- Test with actual data sources
+- Verify authentication flows
 
-**In Autonomous mode:** Generate all files, then present a summary:
+### Validation Checklist
+1. Agent responds to basic messages
+2. Each tool function executes correctly
+3. Connectors return expected data
+4. Authentication works for all flows
+5. Error handling covers failure cases
+
+---
+
+## Phase 7: Deploy and Govern
+
+### Deploy
+- Provision Azure resources (via Agents Toolkit or Azure MCP Server)
+- Deploy agent code
+- Configure DNS and endpoints
+- Verify the deployment
+
+### Governance
+- Register with Agent 365 (if enterprise deployment)
+- Configure Entra ID permissions
+- Set up monitoring (Application Insights, Copilot Analytics)
+- Publish to org catalog or Teams store
+
+---
+
+## Execution Modes
+
+### Guided (Default)
+Walk through each phase step-by-step. At every step:
+
 ```
-✅ PROJECT GENERATED: contoso-support-agent/
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT:        [What is being created or configured]
+WHY:         [Why it matters — linked to the plan]
+HOW:         [Exact command or file change]
+VERIFY:      [How to confirm it worked]
+LEARN:       [What concept this teaches]
+TROUBLESHOOT: [Common failures and fixes]
+```
 
-Files created: 24
-Architecture: Custom Engine (Python + Semantic Kernel)
-Infrastructure: 5 Bicep modules (App Service, Bot, KV, Identity, Monitoring)
-Tools: 3 (customer_lookup, create_ticket, check_status)
-Tests: 8 test cases
+Present one step at a time. Wait for confirmation. Explain as you go.
+
+### Autonomous
+Generate and execute everything, then present a summary:
+
+```
+PROJECT BUILT: [project-name]/
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Scaffolded: agents-toolkit new [template] --lang [language]
+Files added: [count] (infra, tools, config, tests, CLAUDE.md)
+MCP servers: [configured servers]
 
 NEXT STEPS:
-1. Copy .env.example to .env and fill in values
-2. Run: ./scripts/setup-local.sh
-3. Run: docker-compose up
-4. Test in Agents Playground at http://localhost:5000
-5. Deploy: ./scripts/deploy.sh
-
-Full documentation in README.md
+1. Review CLAUDE.md for full project context
+2. Copy .env.example to .env and fill in values
+3. Run: [local dev command]
+4. Test in Agents Playground
+5. Deploy: [deploy command]
 ```
 
-### Phase 5: Validation
+### Hybrid (Recommended)
+Autonomous for scaffolding, infra, and boilerplate. Guided for agent instructions,
+tools, and connectors where the user's domain knowledge matters.
 
-After building, verify the solution works:
+Read `references/execution-modes.md` for detailed guidance.
 
-1. **Smoke test** — Agent responds to basic messages
-2. **Tool test** — Each tool function executes correctly
-3. **Integration test** — Cross-component communication works
-4. **Security test** — Permissions are least-privilege
-5. **Governance test** — Agent 365 registration confirmed
+---
 
 ## Safety and Guardrails
 
 **Non-negotiable (always enforced):**
 - Never store secrets in plain text — Key Vault only
 - Never assign Owner/Global Admin automatically
-- Always create in user's specified subscription/region
+- Always use the user's specified subscription/region
 - Always include cleanup/teardown scripts
-- Always estimate cost before provisioning
+- Always estimate cost before provisioning production resources
 - Require explicit approval for production deployments
+- Always generate CLAUDE.md with every project
 
 **Configurable:**
 - Auto-approval for dev/sandbox environments
@@ -238,22 +321,32 @@ After building, verify the solution works:
 
 Read `references/automation-guardrails.md` for the complete framework.
 
+---
+
 ## MCP Server Integration for Automation
 
-When available, use MCP servers for automated execution:
+When MCP servers are available, use them instead of asking the user to run CLI commands
+they may not understand:
 
-| MCP Server | Automation Capability |
-|-----------|---------------------|
-| **Azure CLI** | Resource provisioning, configuration |
-| **Microsoft Graph** | App registrations, permissions |
-| **Power Platform CLI** | Copilot Studio import/export |
-| **GitHub** | Repository creation, code push |
-| **Azure DevOps** | Pipeline creation, deployment |
+| MCP Server | What It Automates |
+|-----------|-------------------|
+| **Azure MCP Server** | Resource groups, App Service, Container Apps, Key Vault, OpenAI, Functions |
+| **Microsoft Graph MCP** | Entra app registrations, permissions, service principals |
+| **GitHub MCP Server** | Repository creation, branch protection, Actions workflows, code push |
+| **Azure DevOps MCP** | Pipeline creation, deployment, work items |
+| **Power Platform CLI** | Copilot Studio solution import/export, environment management |
+| **Foundry MCP Server** | Model deployment, endpoint configuration, evaluations |
+
+Read `references/mcp-automation.md` for automation patterns with each server.
+
+---
 
 ## Reference Files
 
+- **`references/environment-tooling.md`** — MCP server, extension, and CLI mapping for plan requirements
+- **`references/project-claude-template.md`** — Template for generating project CLAUDE.md files
 - **`references/validation-rules.md`** — Design validation ruleset
-- **`references/iac-templates.md`** — Bicep/ARM/Terraform patterns
-- **`references/agent-scaffolds.md`** — Agent project scaffolds
-- **`references/automation-guardrails.md`** — Safety framework
+- **`references/iac-templates.md`** — Bicep/ARM patterns for agent infrastructure
+- **`references/agent-scaffolds.md`** — Agents Toolkit scaffold commands and customization
+- **`references/automation-guardrails.md`** — Safety framework for automated builds
 - **`references/mcp-automation.md`** — MCP server automation patterns

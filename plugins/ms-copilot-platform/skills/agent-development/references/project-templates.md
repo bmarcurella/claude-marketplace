@@ -1,232 +1,162 @@
-# Reusable Project Templates
+# Agents Toolkit Templates & Scaffold Reference
 
-Scaffold templates for each agent type. These templates are used by both the
-guided walkthrough and autonomous build modes to ensure consistency.
+The Microsoft Agents Toolkit provides project templates for both declarative and custom engine
+agents. Always use `agents-toolkit new` to scaffold — do NOT generate project files manually.
+The Toolkit templates stay current with SDK versions and include correct dependencies.
 
-## Template Index
+## Important: Verify Before Scaffolding
 
-| Template | Agent Type | Language | Framework |
-|----------|-----------|----------|-----------|
-| T1 | Custom Engine | Python | Semantic Kernel |
-| T2 | Custom Engine | Python | LangChain |
-| T3 | Custom Engine | C# / .NET | Semantic Kernel |
-| T4 | Custom Engine | TypeScript | Semantic Kernel |
-| T5 | Declarative Agent | JSON + API | Agents Toolkit |
-| T6 | Copilot Studio | Solution Package | Power Platform |
-| T7 | MCP Server | Python | FastMCP |
-| T8 | Multi-Agent (A2A) | Python | Mixed |
+Template names and options change with Toolkit updates. Before running any scaffold command,
+use `microsoft_docs_search` to verify the current template catalog:
+- Search: "Agents Toolkit project templates"
+- Search: "agents-toolkit new command options"
 
-## T1: Custom Engine — Python + Semantic Kernel
+## Agents Toolkit Templates
 
-### File Manifest
+### Declarative Agent Templates
 
+| Template | What It Creates | Use When |
+|----------|----------------|----------|
+| **declarative-agent** | M365 Copilot agent with custom instructions and knowledge | Agent extends Copilot with custom behavior, no hosting needed |
+| **declarative-agent-with-api** | Declarative agent + OpenAPI plugin | Agent needs to call external REST APIs |
+| **declarative-agent-with-connector** | Declarative agent + Copilot connector | Agent needs external data via Microsoft Graph connector |
+
+**Scaffold commands:**
+```bash
+# Basic declarative agent
+agents-toolkit new declarative-agent --name "my-agent"
+
+# Declarative agent with API plugin
+agents-toolkit new declarative-agent-with-api --name "my-agent"
+
+# Declarative agent with connector
+agents-toolkit new declarative-agent-with-connector --name "my-agent"
 ```
-{agent-name}/
-├── README.md
-├── src/
-│   ├── app.py
-│   ├── agent.py
-│   ├── config.py
-│   └── tools/
-│       ├── __init__.py
-│       └── {domain}_tools.py
-├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
-├── .env.example
+
+**What the Toolkit generates:**
+```
+my-agent/
 ├── appPackage/
-│   ├── manifest.json
+│   ├── manifest.json              # Teams/M365 app manifest
+│   ├── declarativeAgent.json      # Agent definition (instructions, capabilities)
+│   ├── instruction.md             # System prompt (agent personality and rules)
+│   ├── outline.png                # App icon (outline)
+│   └── color.png                  # App icon (color)
+├── env/                           # Environment files per stage
+├── teamsapp.yml                   # Agents Toolkit lifecycle config
+└── teamsapp.local.yml             # Local debug config
+```
+
+### Custom Engine Agent Templates
+
+| Template | Language | Framework | Use When |
+|----------|----------|-----------|----------|
+| **custom-engine-agent** | Python | Agents SDK | Full control over AI model and orchestration |
+| **custom-engine-agent** | C# | Agents SDK | .NET-based custom engine |
+| **custom-engine-agent** | TypeScript | Agents SDK | Node.js-based custom engine |
+
+**Scaffold commands:**
+```bash
+# Python custom engine
+agents-toolkit new custom-engine-agent --lang python --name "my-agent"
+
+# C# custom engine
+agents-toolkit new custom-engine-agent --lang csharp --name "my-agent"
+
+# TypeScript custom engine
+agents-toolkit new custom-engine-agent --lang typescript --name "my-agent"
+```
+
+**What the Toolkit generates (Python example):**
+```
+my-agent/
+├── src/
+│   ├── app.py                     # Agent entry point
+│   ├── config.py                  # Configuration/settings
+│   └── bot.py                     # Activity handler
+├── appPackage/
+│   ├── manifest.json              # Teams/M365 app manifest
 │   ├── outline.png
 │   └── color.png
-├── infra/
-│   ├── main.bicep
-│   ├── main.parameters.json
-│   └── modules/
-│       ├── app-service.bicep
-│       ├── bot-service.bicep
-│       ├── keyvault.bicep
-│       ├── identity.bicep
-│       └── monitoring.bicep
-├── scripts/
-│   ├── deploy.sh
-│   ├── cleanup.sh
-│   └── setup-local.sh
-├── tests/
-│   ├── test_agent.py
-│   └── test_tools.py
-└── .github/workflows/deploy.yml
+├── infra/                         # Bicep templates for Azure
+│   ├── azure.bicep
+│   └── azure.parameters.json
+├── env/
+├── requirements.txt
+├── Dockerfile
+├── teamsapp.yml
+└── teamsapp.local.yml
 ```
 
-### app.py (Entry Point)
-```python
-"""Agent entry point — configures and starts the agent host."""
-import os
-from dotenv import load_dotenv
-from microsoft_agents.builder import AgentBuilder
-from microsoft_agents.hosting.aio import AgentHost
-from agent import create_agent
-from config import Settings
+### Other Templates
 
-load_dotenv()
-settings = Settings()
-
-agent = create_agent(settings)
-
-host = AgentHost()
-host.add_agent("agent", agent)
-host.run(port=settings.port)
+The Toolkit may offer additional templates for specific scenarios. Check current availability:
+```bash
+agents-toolkit new --list
 ```
 
-### agent.py (Core Agent)
-```python
-"""Core agent logic — handles messages and orchestrates AI responses."""
-from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-from microsoft_agents.core import ActivityHandler
-from config import Settings
+## What the Toolkit Handles vs What We Add
 
-def create_agent(settings: Settings) -> ActivityHandler:
-    # Initialize Semantic Kernel
-    kernel = Kernel()
-    kernel.add_service(AzureChatCompletion(
-        service_id="chat",
-        deployment_name=settings.azure_openai_deployment,
-        endpoint=settings.azure_openai_endpoint,
-        api_key=settings.azure_openai_key
-    ))
+| Concern | Toolkit Provides | This Plugin Adds |
+|---------|-----------------|------------------|
+| Project structure | Base scaffold with correct dependencies | — |
+| Agent manifest | Manifest template | Customized metadata and capabilities |
+| Agent instructions | Empty/minimal instruction.md | Crafted system prompt with role, boundaries, fallback |
+| Tools/actions | Skeleton handler | Domain-specific tool implementations |
+| Infrastructure | Basic Bicep templates | Additional modules (Key Vault, monitoring, MCP servers) |
+| Testing | Local debug config | Test scenarios, integration tests |
+| CI/CD | — | GitHub Actions / Azure DevOps pipelines |
+| CLAUDE.md | — | Full project context for AI assistants |
+| Docker | Basic Dockerfile | docker-compose for local dev with MCP servers |
+| Governance | — | Agent 365 registration, Entra config |
 
-    # Register tool plugins
-    from tools import DomainTools
-    kernel.add_plugin(DomainTools(), "domain")
+## Supplementary Templates (Not from Agents Toolkit)
 
-    class Agent(ActivityHandler):
-        async def on_message_activity(self, turn_context):
-            user_message = turn_context.activity.text
-            result = await kernel.invoke_prompt(
-                f"{{{{$input}}}}",
-                input_vars={"input": user_message}
-            )
-            await turn_context.send_activity(str(result))
+These templates cover scenarios the Agents Toolkit doesn't scaffold. The platform-builder
+skill generates these when the plan requires them.
 
-    return Agent()
-```
+### MCP Server (Python + FastMCP)
 
-### config.py (Settings)
-```python
-"""Configuration management — loads from environment variables."""
-import os
-
-class Settings:
-    def __init__(self):
-        self.port = int(os.getenv("PORT", "3978"))
-        self.azure_openai_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
-        self.azure_openai_key = os.environ["AZURE_OPENAI_KEY"]
-        self.azure_openai_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
-        self.app_id = os.environ.get("MICROSOFT_APP_ID", "")
-        self.app_password = os.environ.get("MICROSOFT_APP_PASSWORD", "")
-```
-
-### .env.example
-```
-# Azure OpenAI
-AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-AZURE_OPENAI_KEY=your-key-here
-AZURE_OPENAI_DEPLOYMENT=gpt-4o
-
-# Microsoft App Registration
-MICROSOFT_APP_ID=
-MICROSOFT_APP_PASSWORD=
-
-# Agent Configuration
-PORT=3978
-```
-
-## T7: MCP Server — Python + FastMCP
-
-### File Manifest
+For when the agent needs custom tools exposed via MCP:
 
 ```
 {mcp-server-name}/
-├── README.md
-├── mcp_server.py
-├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
+├── mcp_server.py              # MCP server with tool definitions
+├── requirements.txt           # fastmcp + dependencies
+├── Dockerfile                 # Container for deployment
+├── docker-compose.yml         # Local dev alongside the agent
 ├── .env.example
 ├── infra/
-│   ├── container-app.bicep
-│   └── container-app.parameters.json
+│   └── container-app.bicep    # Azure Container Apps deployment
 ├── scripts/
 │   ├── deploy.sh
-│   ├── cleanup.sh
-│   └── test-tools.sh
+│   └── cleanup.sh
 └── tests/
     └── test_tools.py
 ```
 
-### mcp_server.py
-```python
-"""MCP Server — exposes domain tools for agent consumption."""
-from fastmcp import FastMCP
-import os
-from dotenv import load_dotenv
+### Multi-Agent System (A2A)
 
-load_dotenv()
-
-mcp = FastMCP(
-    name="{server-name}",
-    description="{Server description}"
-)
-
-@mcp.tool()
-async def example_tool(param1: str, param2: int = 10) -> dict:
-    """Description of what this tool does.
-
-    Args:
-        param1: Description of param1
-        param2: Description of param2 (default: 10)
-    """
-    # Implementation here
-    return {"result": "success"}
-
-@mcp.resource("{domain}://items")
-async def list_items() -> str:
-    """List all available items."""
-    # Implementation here
-    return "[]"
-
-if __name__ == "__main__":
-    transport = os.getenv("MCP_TRANSPORT", "sse")
-    port = int(os.getenv("MCP_PORT", "8080"))
-    mcp.run(transport=transport, host="0.0.0.0", port=port)
-```
-
-## T8: Multi-Agent System (A2A)
-
-### File Manifest
+For when multiple agents coordinate via Agent-to-Agent protocol:
 
 ```
 {system-name}/
-├── README.md
-├── router/                  # Router/orchestrator agent
+├── router/                    # Orchestrator agent
 │   ├── src/
 │   │   ├── app.py
 │   │   ├── router_agent.py
 │   │   └── agent_registry.py
 │   ├── requirements.txt
 │   └── Dockerfile
-├── agents/                  # Specialist agents
+├── agents/                    # Specialist agents
 │   ├── {agent-1}/
 │   │   ├── src/
-│   │   │   ├── app.py
-│   │   │   ├── agent.py
-│   │   │   └── tools/
-│   │   ├── agent-card.json
+│   │   ├── agent-card.json    # A2A agent card for discovery
 │   │   ├── requirements.txt
 │   │   └── Dockerfile
 │   └── {agent-2}/
 │       └── ... (same structure)
-├── docker-compose.yml       # Runs all agents locally
+├── docker-compose.yml         # Runs all agents locally
 ├── infra/
 │   ├── main.bicep
 │   └── modules/
@@ -235,51 +165,51 @@ if __name__ == "__main__":
 │       └── agent-app.bicep
 ├── scripts/
 │   ├── deploy-all.sh
-│   ├── cleanup-all.sh
-│   └── test-a2a.sh
-└── .github/workflows/deploy.yml
+│   └── cleanup-all.sh
+└── CLAUDE.md                  # System-level project context
 ```
 
-### docker-compose.yml for Multi-Agent
-```yaml
-version: '3.8'
-services:
-  router:
-    build: ./router
-    ports:
-      - "3978:3978"
-    environment:
-      - AGENT_REGISTRY_URL=http://registry:8080
-      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
-      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
-    depends_on:
-      - agent-hr
-      - agent-it
+## Adding Orchestration Frameworks
 
-  agent-hr:
-    build: ./agents/hr-agent
-    ports:
-      - "3979:3978"
-    environment:
-      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
-      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
+After scaffolding with the Toolkit, add an orchestration framework if the plan calls for one:
 
-  agent-it:
-    build: ./agents/it-agent
-    ports:
-      - "3980:3978"
-    environment:
-      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
-      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
+### Adding Semantic Kernel
+```bash
+# Python
+pip install semantic-kernel
+
+# C#
+dotnet add package Microsoft.SemanticKernel
 ```
 
-## Template Customization Notes
+Then modify the agent handler to use Kernel for orchestration.
+See `references/orchestration-frameworks.md` for integration patterns.
 
-When generating from these templates:
-1. Replace all `{placeholders}` with actual names
-2. Customize tools/ directory for the specific domain
-3. Adjust Bicep modules based on actual infrastructure needs
-4. Update manifest.json with correct app IDs and descriptions
-5. Set appropriate AI model and deployment names
-6. Add domain-specific test cases
-7. Customize README with architecture-specific content
+### Adding LangChain
+```bash
+# Python
+pip install langchain langchain-openai langgraph
+```
+
+See `references/orchestration-frameworks.md` for LangChain + Agents SDK integration.
+
+## Template Selection Logic
+
+Use this decision tree when choosing a template:
+
+1. Does the agent need its own AI model or custom orchestration?
+   - **No** → Declarative agent template
+   - **Yes** → Custom engine template
+
+2. (If declarative) Does it call external APIs?
+   - **No** → `declarative-agent`
+   - **Yes, REST APIs** → `declarative-agent-with-api`
+   - **Yes, via Graph connector** → `declarative-agent-with-connector`
+
+3. (If custom engine) What language?
+   - Python (default for AI/data users) → `--lang python`
+   - C# (default for .NET shops) → `--lang csharp`
+   - TypeScript (default for web devs) → `--lang typescript`
+
+4. Does it need MCP server tools? → Add supplementary MCP server template
+5. Does it coordinate with other agents? → Add supplementary multi-agent template
