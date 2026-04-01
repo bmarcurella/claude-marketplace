@@ -1,0 +1,41 @@
+{
+  "name": "bmarcurella-claude-marketplace",
+  "metadata": {
+    "description": "Brandon Marcurella's personal plugin marketplace — Microsoft platform guides, agent development skills, and plugin templates. Compatible with both Copilot CLI and Claude Code.",
+    "version": "1.0.0"
+  },
+  "owner": {
+    "name": "Brandon Marcurella",
+    "email": "bmarcurella@github.com"
+  },
+  "plugins": [
+    {
+      "name": "ms-copilot-platform",
+      "description": "Comprehensive guide to the Microsoft Frontier Agent Platform — architecture, agent development, connectors, governance, hands-on labs, and automated infrastructure building.",
+      "version": "1.1.0",
+      "author": {
+        "name": "Brandon Marcurella"
+      },
+      "source": "./plugins/ms-copilot-platform",
+      "category": "productivity",
+      "keywords": [
+        "microsoft",
+        "copilot",
+        "agents",
+        "azure",
+        "m365",
+        "mcp",
+        "copilot-studio",
+        "frontier-agent-platform"
+      ],
+      "license": "MIT",
+      "skills": [
+        "./skills/agent-development",
+        "./skills/agent-governance",
+        "./skills/connectors-data",
+        "./skills/platform-architecture",
+        "./skills/platform-builder"
+      ]
+    }
+  ]
+}

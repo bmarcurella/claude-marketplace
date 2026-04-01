@@ -16,16 +16,6 @@
       },
       "source": "./plugins/ms-copilot-platform",
       "category": "productivity"
-    },
-    {
-      "name": "example-plugin",
-      "description": "A template plugin demonstrating skills and commands structure. Copy this to create new plugins.",
-      "version": "1.0.0",
-      "author": {
-        "name": "Brandon Marcurella"
-      },
-      "source": "./plugins/example-plugin",
-      "category": "development"
     }
   ]
 }

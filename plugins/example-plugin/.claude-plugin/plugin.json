@@ -1,7 +1,0 @@
-{
-  "name": "example-plugin",
-  "description": "A template plugin demonstrating skills and commands structure. Copy this to create new plugins.",
-  "author": {
-    "name": "Brandon Marcurella"
-  }
-}
